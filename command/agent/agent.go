@@ -604,19 +604,21 @@ func (a *Agent) AddService(service *structs.NodeService, chkTypes CheckTypes, pe
 		}
 	}
 
-	// Warn if the service name is incompatible with DNS
-	if !dnsNameRe.MatchString(service.Service) {
-		a.logger.Printf("[WARN] Service name %q will not be discoverable "+
-			"via DNS due to invalid characters. Valid characters include "+
-			"all alpha-numerics and dashes.", service.Service)
-	}
-
-	// Warn if any tags are incompatible with DNS
-	for _, tag := range service.Tags {
-		if !dnsNameRe.MatchString(tag) {
-			a.logger.Printf("[WARN] Service tag %q will not be discoverable "+
+	if a.config.Ports.DNS != -1 {
+		// Warn if the service name is incompatible with DNS
+		if !dnsNameRe.MatchString(service.Service) {
+			a.logger.Printf("[WARN] Service name %q will not be discoverable "+
 				"via DNS due to invalid characters. Valid characters include "+
-				"all alpha-numerics and dashes.", tag)
+				"all alpha-numerics and dashes.", service.Service)
+		}
+
+		// Warn if any tags are incompatible with DNS
+		for _, tag := range service.Tags {
+			if !dnsNameRe.MatchString(tag) {
+				a.logger.Printf("[WARN] Service tag %q will not be discoverable "+
+					"via DNS due to invalid characters. Valid characters include "+
+					"all alpha-numerics and dashes.", tag)
+			}
 		}
 	}
 
